@@ -39,9 +39,9 @@
     <link rel="stylesheet" href="./main.css" />
   </head>
   <body>
-    <div class="container">
+    <main class="container">
       <!-- 소개 -->
-      <section>
+      <section data-analytics-section="intro">
         <h1>안녕하세요,<br />한승완입니다<span class="period-mark">.</span></h1>
         <p class="big-paragraph">
           백엔드 엔지니어링을 주로 해왔고, 창업팀 합류 후에는 프론트엔드와
@@ -50,7 +50,7 @@
         </p>
       </section>
       <!-- 업무 -->
-      <section>
+      <section data-analytics-section="experience">
         <h2>업무</h2>
         <!-- Techmeet -->
         <div class="row">
@@ -70,6 +70,8 @@
               <p>
                 사용자와 조건에 잘 맞는 (프리미엄)요양보호사를 연결하는
                 <a
+                  data-analytics-group="project_link"
+                  data-analytics-id="project_soonseeme"
                   href="https://www.anl.kr/platform"
                   rel="noopener noreferrer"
                   target="_blank"
@@ -108,6 +110,8 @@
               <p>
                 개인 맞춤형 스포츠 보충제를 추천하는
                 <a
+                  data-analytics-group="project_link"
+                  data-analytics-id="project_ultimate_potential"
                   href="https://ultimatepotential.co.kr/"
                   rel="noopener noreferrer"
                   target="_blank"
@@ -138,6 +142,8 @@
                 청과물의 유통 단계를 축소하여 고품질의 상품을 합리적인 가격에
                 제공하는
                 <a
+                  data-analytics-group="project_link"
+                  data-analytics-id="project_domaado"
                   href="https://www.youtube.com/@domaado"
                   rel="noopener noreferrer"
                   target="_blank"
@@ -170,6 +176,8 @@
                 변호사가 제공하는 다양한 서비스 중에서 온라인(비대면)으로 처리
                 가능한 서비스를 합리적인 가격에 제공하는
                 <a
+                  data-analytics-group="project_link"
+                  data-analytics-id="project_law_direct"
                   href="https://www.job-post.co.kr/news/articleView.html?idxno=21933"
                   rel="noopener noreferrer"
                   target="_blank"
@@ -277,7 +285,7 @@
         </div>
       </section>
       <!-- 교육 -->
-      <section>
+      <section data-analytics-section="education">
         <h2>교육</h2>
         <div class="other">
           <h3>웹 개발 부트캠프</h3>
@@ -297,7 +305,7 @@
         </div>
       </section>
       <!-- 기술 -->
-      <section>
+      <section data-analytics-section="skills">
         <h2>기술</h2>
         <div class="other">
           <h3>Backend</h3>
@@ -334,15 +342,41 @@
         </div>
       </section>
       <!-- 연락처 -->
-      <section>
+      <section data-analytics-section="contact">
         <h2>연락처</h2>
         <ul>
           <li>
-            <a href="https://github.com/han0gu" target="_blank">GitHub</a>
+            <a
+              data-analytics-group="contact"
+              data-analytics-id="contact_github"
+              href="https://github.com/han0gu"
+              rel="noopener noreferrer"
+              target="_blank"
+              >GitHub</a
+            >
           </li>
-          <li><a href="mailto:imgum9@gmail.com">Email</a></li>
+          <li>
+            <a
+              data-analytics-group="contact"
+              data-analytics-id="contact_email"
+              href="mailto:imgum9@gmail.com"
+              >Email</a
+            >
+          </li>
         </ul>
       </section>
-    </div>
+    </main>
+    <footer class="site-footer">
+      <p class="analytics-notice">
+        방문 통계 분석을 위해 Google Analytics를 사용합니다.
+        <a
+          href="https://policies.google.com/privacy"
+          rel="noopener noreferrer"
+          target="_blank"
+          >Google 개인정보처리방침</a
+        >
+      </p>
+    </footer>
+    <script src="./analytics.js"></script>
   </body>
 </html>
