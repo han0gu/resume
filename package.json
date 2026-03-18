@@ -7,8 +7,9 @@
   "scripts": {
     "start": "parcel src/index.html",
     "build": "rm -rf dist && parcel build --no-cache -d dist --public-url /resume src/index.html",
+    "check:analytics": "node scripts/check-analytics.js",
     "check:dist": "node scripts/check-dist.js",
-    "check:site": "yarn build && yarn check:dist"
+    "check:site": "yarn check:analytics && yarn build && yarn check:dist"
   },
   "dependencies": {
     "normalize.css": "^8.0.0",

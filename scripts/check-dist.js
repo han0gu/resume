@@ -72,6 +72,7 @@ const html = readFile(indexPath);
   "GitHub",
   "Email",
   "Google Analytics를 사용합니다.",
+  "UTM 기반 유입 출처 측정",
 ].forEach((snippet) => {
   if (!html.includes(snippet)) {
     fail(`Built HTML is missing expected content: ${snippet}`);
@@ -112,6 +113,21 @@ const jsFiles = fs
 if (!jsFiles.length) {
   fail("No JavaScript bundles were generated.");
 }
+
+[
+  "resume_company",
+  "resume_channel",
+  "resume_campaign",
+  "resume_content",
+].forEach((customParam) => {
+  const hasCustomParam = jsFiles.some((filePath) =>
+    readFile(filePath).includes(customParam)
+  );
+
+  if (!hasCustomParam) {
+    fail(`Built bundle is missing the ${customParam} tracking parameter.`);
+  }
+});
 
 if (measurementId) {
   const hasInjectedMeasurementId = jsFiles.some((filePath) =>
