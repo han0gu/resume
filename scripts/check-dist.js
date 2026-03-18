@@ -113,6 +113,21 @@ if (!jsFiles.length) {
   fail("No JavaScript bundles were generated.");
 }
 
+[
+  "resume_company",
+  "resume_channel",
+  "resume_campaign",
+  "resume_content",
+].forEach((customParam) => {
+  const hasCustomParam = jsFiles.some((filePath) =>
+    readFile(filePath).includes(customParam)
+  );
+
+  if (!hasCustomParam) {
+    fail(`Built bundle is missing the ${customParam} tracking parameter.`);
+  }
+});
+
 if (measurementId) {
   const hasInjectedMeasurementId = jsFiles.some((filePath) =>
     readFile(filePath).includes(measurementId)
