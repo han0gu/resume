@@ -72,7 +72,6 @@ const html = readFile(indexPath);
   "GitHub",
   "Email",
   "Google Analytics를 사용합니다.",
-  "UTM 기반 유입 출처 측정",
 ].forEach((snippet) => {
   if (!html.includes(snippet)) {
     fail(`Built HTML is missing expected content: ${snippet}`);

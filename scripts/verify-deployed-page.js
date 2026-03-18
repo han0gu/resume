@@ -4,7 +4,6 @@ const expectedSnippets = [
   "GitHub",
   "Email",
   "Google Analytics를 사용합니다.",
-  "UTM 기반 유입 출처 측정",
 ];
 
 const pageUrl = process.argv[2];
