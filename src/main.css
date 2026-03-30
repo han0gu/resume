@@ -187,6 +187,42 @@ ul > li:before {
   border-bottom: 1px solid #eeeeee;
 }
 
+.education-overview {
+  margin-bottom: 1.5rem;
+}
+
+.placeholder-note {
+  color: #666666;
+}
+
+.education-project-title {
+  font-size: 1.3rem;
+  margin: 0 0 0.35rem 0;
+}
+
+.education-project-meta {
+  margin: 0 0 0.75rem 0;
+  color: #666666;
+  font-size: 1rem;
+}
+
+@media screen and (max-width: 960px) {
+  .education-project-title {
+    font-size: 1.15rem;
+  }
+}
+
+@media screen and (min-width: 961px) {
+  .education-project-title + h5 {
+    margin-top: 0.75rem;
+  }
+
+  .project p:not(.education-project-meta) + h5,
+  .project ul + h5 {
+    margin-top: 1.25rem;
+  }
+}
+
 .role {
   display: block;
 }
