@@ -297,21 +297,153 @@
       <!-- 교육 -->
       <section data-analytics-section="education">
         <h2>교육</h2>
-        <div class="other">
-          <h3>웹 개발 부트캠프</h3>
-          <span class="time">
-            <time datetime="2021-08-17">2021. 08</time> -
-            <time datetime="2021-12-10">2021. 12</time>
-          </span>
-          <p>TypeScript, React, Node.js</p>
+        <!-- Upstage -->
+        <div class="row education-program">
+          <div class="row-left">
+            <h3>Upstage</h3>
+            <!-- <span class="role"></span> -->
+            <span>
+              <time datetime="2026-01-01">2026. 01</time> -
+              <time datetime="2026-04-30">2026. 04 (진행 중)</time>
+            </span>
+          </div>
+          <div class="row-right">
+            <!-- 개요 -->
+            <p class="education-overview">
+              Upstage와 SeSAC(서울경제진흥원)이 공동 운영하는 부트캠프에서 LLM,
+              RAG, Agentic Workflow, LLMOps에 대한 이론을 학습하고 이를 활용해
+              AI Agent 서비스를 개발하고 있습니다.
+            </p>
+            <!-- 프로젝트 2 -->
+            <div class="project">
+              <h4 class="education-project-title">
+                국회의원 의정활동·6월 지방선거 후보자 관련 정보 제공 서비스
+              </h4>
+              <p class="education-project-meta">
+                03.10 ~ 04.20 (약 6주, 진행 중)
+              </p>
+              <h5>개요</h5>
+              <p>
+                서울시의 '각 자치구별 국회의원의 의정활동 정보'와 '2026년 6월
+                지방선거 후보자 관련 정보'를 수집·요약해 웹사이트, 인스타그램 등
+                멀티 채널로 제공하는 서비스를 개발하고 있습니다.
+              </p>
+              <h5>세부 진행사항</h5>
+              <ul>
+                <li>프로젝트 주제 발제 및 팀 빌딩</li>
+                <li>개별 팀원의 역할 분배 및 프로젝트 일정 관리</li>
+                <li>인프라를 포함한 백엔드 스켈레톤 구축</li>
+                <li>
+                  팀원 5명이 균일한 산출물을 만들 수 있도록 LLM workflow 공통
+                  실행 환경(하네스) 설정
+                </li>
+                <li>
+                  공공 API, 웹사이트 크롤링 등 다양한 출처로부터
+                  국회의원·지방선거 데이터를 수집하는 파이프라인 초안 개발
+                </li>
+                <li>
+                  지방선거 후보자 데이터를 스크립트 기반 정적 분석과 LLM 기반
+                  동적 분석을 결합해 검증·요약하는 workflow 개발
+                </li>
+                <li>
+                  요약한 지방선거 후보자 데이터를 기반으로 인스타그램 카드뉴스
+                  게시물을 생성하는 workflow 개발
+                </li>
+              </ul>
+              <h5>활용 기술</h5>
+              <ul>
+                <li>AWS, Docker Compose</li>
+                <li>PostgreSQL, Python, FastAPI</li>
+                <li>Upstage Document Parse, Upstage Solar Pro 2</li>
+                <li>LangChain, LangGraph, Langfuse</li>
+              </ul>
+            </div>
+            <!-- 프로젝트 1 -->
+            <div class="project">
+              <h4 class="education-project-title">
+                반려동물 보험 상품 추천 Agentic Workflow 개발
+              </h4>
+              <p class="education-project-meta">02.09 ~ 02.20 (약 2주)</p>
+              <h5>개요</h5>
+              <p>
+                보험사의 반려동물 보험 상품 약관을 기반으로, RAG를 활용한 상품
+                추천 Agentic Workflow를 개발했습니다.
+              </p>
+              <h5>세부 진행사항</h5>
+              <ul>
+                <li>프로젝트 주제 발제 및 팀 빌딩</li>
+                <li>Docker, FastAPI를 기반으로 API 서버 스켈레톤 구축</li>
+                <li>LangGraph 기반 Orchestration Graph 구조 및 State 정의</li>
+                <li>약관 PDF 파싱-청킹-태깅-적재 파이프라인 구축</li>
+                <li>
+                  Hybrid Search(Dense + Sparse) 기반 RAG에서 Dense Retrieval
+                  기능 구현
+                </li>
+              </ul>
+              <h5>활용 기술</h5>
+              <ul>
+                <li>Docker Compose</li>
+                <li>Qdrant</li>
+                <li>Python, FastAPI</li>
+                <li>Upstage Document Parse, Upstage Solar Pro 2</li>
+                <li>LangChain, LangGraph, LangSmith</li>
+              </ul>
+            </div>
+          </div>
         </div>
-        <div class="other">
-          <h3>한양대학교 컴퓨터공학부</h3>
-          <!-- <span class="role">학사</span> -->
-          <span class="time">
-            <time datetime="2009-03-01">2009. 03</time> -
-            <time datetime="2017-12-31">2017. 12</time>
-          </span>
+        <!-- Wecode -->
+        <div class="row">
+          <div class="row-left">
+            <h3>Wecode</h3>
+            <!-- <span class="role"></span> -->
+            <span>
+              <time datetime="2021-08-17">2021. 08</time> -
+              <time datetime="2021-12-10">2021. 12</time>
+            </span>
+          </div>
+          <div class="row-right">
+            <p class="education-overview">
+              창업팀에 최신 기술 스택을 도입하기 위해 회사 대표와 협의 후
+              부트캠프에 참여했습니다. TypeScript, React, Node.js를 중심으로
+              full-stack 웹 개발에 필요한 기술을 학습하고, 팀 프로젝트를 통해
+              실제 구현 경험을 쌓았습니다.
+            </p>
+            <!-- 프로젝트 1 -->
+            <div class="project">
+              <h4 class="education-project-title">LinkedIn 클론 프로젝트</h4>
+              <!-- <p class="education-project-meta"></p> -->
+              <h5>개요</h5>
+              <p>
+                프로젝트 스켈레톤 구축 및 '인맥 관리' 기능 개발을 담당했습니다.
+              </p>
+              <h5>세부 진행사항</h5>
+              <ul>
+                <li>프로젝트 주제 발제 및 팀 빌딩</li>
+                <li>MySQL, Express 기반 백엔드 스켈레톤 구축</li>
+                <li>회원 테이블 스키마 설계</li>
+                <li>인맥 관리 기능의 백엔드/프론트엔드 구현</li>
+              </ul>
+              <h5>활용 기술</h5>
+              <ul>
+                <li>MySQL</li>
+                <li>TypeScript, Express, React</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <!-- 한양대학교 -->
+        <div class="row">
+          <div class="row-left">
+            <h3>한양대학교</h3>
+            <!-- <span class="role"></span> -->
+            <span>
+              <time datetime="2009-03-01">2009. 03</time> -
+              <time datetime="2017-12-31">2017. 12</time>
+            </span>
+          </div>
+          <div class="row-right">
+            <p class="education-overview">컴퓨터공학부 학사</p>
+          </div>
         </div>
       </section>
       <!-- 기술 -->
@@ -338,9 +470,11 @@
           </ul>
         </div>
         <div class="other">
-          <h3>Data / ML</h3>
+          <h3>Data / AI</h3>
           <ul>
             <li>Python 기반 데이터 분석/정제 및 머신러닝 모델 개발</li>
+            <li>Dense Retrieval 기반 RAG 파이프라인 구축</li>
+            <li>LLM, LangGraph 기반 Agentic Workflow 구현</li>
           </ul>
         </div>
         <div class="other">
