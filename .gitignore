@@ -3,9 +3,12 @@ node_modules
 dist
 docs
 data
-AGENTS.md
 
-# superpowers
+# company-and-jd
+company-and-jd/
+
+# LLM
+AGENTS.md
 .superpowers/
 
 # tmp
