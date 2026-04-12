@@ -6,6 +6,31 @@ const { chromium } = require("playwright-core");
 const projectRoot = path.resolve(__dirname, "..");
 const distDir = path.join(projectRoot, "dist");
 
+const PRESET_DEFINITIONS = {
+  "a4-print": {
+    fileName: "resume-a4-print.pdf",
+    media: "print",
+    viewport: { width: 1440, height: 1200 },
+    pdf: {
+      format: "A4",
+      preferCSSPageSize: true,
+      scale: 1,
+    },
+  },
+  "desktop-long-canvas": {
+    fileName: "resume-desktop-long-canvas.pdf",
+    media: "screen",
+    viewport: { width: 1440, height: 1200 },
+    longCanvas: true,
+  },
+  "mobile-long-canvas": {
+    fileName: "resume-mobile-long-canvas.pdf",
+    media: "screen",
+    viewport: { width: 390, height: 844 },
+    longCanvas: true,
+  },
+};
+
 function fail(message) {
   console.error(`[export-pdf] ${message}`);
   process.exit(1);
@@ -42,14 +67,28 @@ function getArgValue(name, argv = process.argv.slice(2)) {
   return entry ? entry.slice(prefix.length) : "";
 }
 
-function getMode(argv = process.argv.slice(2)) {
-  const mode = getArgValue("mode", argv) || "print";
+function getRequestedPreset(argv = process.argv.slice(2)) {
+  const preset = getArgValue("preset", argv);
 
-  if (!["print", "legacy", "both"].includes(mode)) {
-    fail(`Unsupported mode: ${mode}`);
+  if (!preset) {
+    fail("Missing required --preset argument.");
   }
 
-  return mode;
+  return preset;
+}
+
+function getPresetNames(argv = process.argv.slice(2)) {
+  const preset = getRequestedPreset(argv);
+
+  if (preset === "all") {
+    return Object.keys(PRESET_DEFINITIONS);
+  }
+
+  if (!PRESET_DEFINITIONS[preset]) {
+    fail(`Unsupported preset: ${preset}`);
+  }
+
+  return [preset];
 }
 
 function getOutputDir(argv = process.argv.slice(2)) {
@@ -208,7 +247,10 @@ function contentTypeFor(filePath) {
 
 function isPathInsideDirectory(directoryPath, targetPath) {
   const relativePath = path.relative(directoryPath, targetPath);
-  return relativePath === "" || (!relativePath.startsWith("..") && !path.isAbsolute(relativePath));
+  return (
+    relativePath === "" ||
+    (!relativePath.startsWith("..") && !path.isAbsolute(relativePath))
+  );
 }
 
 function resolveRequestPath(urlPath) {
@@ -305,45 +347,94 @@ function startStaticServer() {
   });
 }
 
-async function renderVariant(browser, baseUrl, outputPath, options = {}) {
-  const page = await browser.newPage({
-    viewport: { width: 1440, height: 1200 },
-    deviceScaleFactor: 1,
+async function measureDocumentHeight(page) {
+  return page.evaluate(() => {
+    const body = document.body;
+    const doc = document.documentElement;
+
+    return (
+      Math.ceil(
+        Math.max(
+          body.scrollHeight,
+          body.offsetHeight,
+          doc.clientHeight,
+          doc.scrollHeight,
+          doc.offsetHeight
+        )
+      ) + 1
+    );
   });
+}
 
-  const media = options.media || "print";
-  await page.emulateMedia({ media });
-  await page.goto(baseUrl, { waitUntil: "networkidle" });
-  await page.evaluate(() => document.fonts && document.fonts.ready);
+function buildPdfOptions(preset, outputPath, documentHeight) {
+  if (preset.longCanvas) {
+    return {
+      path: outputPath,
+      printBackground: true,
+      displayHeaderFooter: false,
+      preferCSSPageSize: true,
+      scale: 1,
+    };
+  }
 
-  await page.pdf({
+  return {
     path: outputPath,
     printBackground: true,
     displayHeaderFooter: false,
-    format: options.format || "A4",
-    preferCSSPageSize: Boolean(options.preferCSSPageSize),
-    scale: options.scale || 1,
-  });
-
-  await page.close();
+    format: preset.pdf?.format || "A4",
+    preferCSSPageSize: Boolean(preset.pdf?.preferCSSPageSize),
+    scale: preset.pdf?.scale || 1,
+  };
 }
 
-function buildOutputMap(outputDir, mode) {
-  const outputs = {};
+function buildLongCanvasPageStyle(preset, documentHeight) {
+  return [
+    "@page {",
+    `  size: ${preset.viewport.width}px ${documentHeight}px;`,
+    "  margin: 0;",
+    "}",
+    "html, body {",
+    "  margin: 0;",
+    "}",
+  ].join("\n");
+}
 
-  if (mode === "legacy" || mode === "both") {
-    outputs.legacy = path.join(outputDir, "resume-a4-legacy-screen.pdf");
+async function renderPreset(browser, baseUrl, outputPath, preset) {
+  const page = await browser.newPage({
+    viewport: preset.viewport,
+    deviceScaleFactor: 1,
+  });
+
+  try {
+    await page.emulateMedia({ media: preset.media });
+    await page.goto(baseUrl, { waitUntil: "networkidle" });
+    await page.evaluate(() => document.fonts && document.fonts.ready);
+
+    const documentHeight = preset.longCanvas ? await measureDocumentHeight(page) : 0;
+
+    if (preset.longCanvas) {
+      await page.addStyleTag({
+        content: buildLongCanvasPageStyle(preset, documentHeight),
+      });
+    }
+
+    const pdfOptions = buildPdfOptions(preset, outputPath, documentHeight);
+
+    await page.pdf(pdfOptions);
+  } finally {
+    await page.close();
   }
+}
 
-  if (mode === "print" || mode === "both") {
-    outputs.print = path.join(outputDir, "resume-a4-print-optimized.pdf");
-  }
-
-  return outputs;
+function buildOutputMap(outputDir, presetNames) {
+  return presetNames.reduce((outputs, presetName) => {
+    outputs[presetName] = path.join(outputDir, PRESET_DEFINITIONS[presetName].fileName);
+    return outputs;
+  }, {});
 }
 
 async function main() {
-  const mode = getMode();
+  const presetNames = getPresetNames();
   const outputDir = getOutputDir();
   const chromePath = assertExecutableExists(getChromePath(), "Chrome executable");
 
@@ -359,20 +450,10 @@ async function main() {
   });
 
   try {
-    const outputs = buildOutputMap(outputDir, mode);
+    const outputs = buildOutputMap(outputDir, presetNames);
 
-    if (outputs.legacy) {
-      await renderVariant(browser, url, outputs.legacy, {
-        media: "screen",
-        format: "A4",
-      });
-    }
-
-    if (outputs.print) {
-      await renderVariant(browser, url, outputs.print, {
-        media: "print",
-        preferCSSPageSize: true,
-      });
+    for (const presetName of presetNames) {
+      await renderPreset(browser, url, outputs[presetName], PRESET_DEFINITIONS[presetName]);
     }
 
     console.log(
@@ -380,7 +461,7 @@ async function main() {
         {
           outputDir,
           baseUrl: url,
-          mode,
+          presetNames,
           outputs,
         },
         null,

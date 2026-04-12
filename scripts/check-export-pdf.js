@@ -34,7 +34,7 @@ function loadExportModule(options = {}) {
   const source = fs.readFileSync(exportScriptPath, "utf8");
   const instrumentedSource = source.replace(
     /\nmain\(\)\.catch\(\(error\) => \{\n[\s\S]*?\n\}\);\s*$/,
-    "\nmodule.exports = { getChromePath, resolveRequestPath, startStaticServer, buildOutputMap };\n"
+    "\nmodule.exports = { getChromePath, getPresetNames, resolveRequestPath, startStaticServer, buildOutputMap };\n"
   );
 
   if (instrumentedSource === source) {
@@ -166,14 +166,24 @@ async function main() {
   };
 
   expectMatch(
-    scripts["export:pdf"],
-    /node\s+scripts\/export-pdf\.js\b[\s\S]*--mode=print\b/,
-    "Missing or unexpected export:pdf script."
+    scripts["export:pdf:a4-print"],
+    /node\s+scripts\/export-pdf\.js\b[\s\S]*--preset=a4-print\b/,
+    "Missing or unexpected export:pdf:a4-print script."
   );
   expectMatch(
-    scripts["export:pdf:compare"],
-    /node\s+scripts\/export-pdf\.js\b[\s\S]*--mode=both\b/,
-    "Missing or unexpected export:pdf:compare script."
+    scripts["export:pdf:desktop-long-canvas"],
+    /node\s+scripts\/export-pdf\.js\b[\s\S]*--preset=desktop-long-canvas\b/,
+    "Missing or unexpected export:pdf:desktop-long-canvas script."
+  );
+  expectMatch(
+    scripts["export:pdf:mobile-long-canvas"],
+    /node\s+scripts\/export-pdf\.js\b[\s\S]*--preset=mobile-long-canvas\b/,
+    "Missing or unexpected export:pdf:mobile-long-canvas script."
+  );
+  expectMatch(
+    scripts["export:pdf:all"],
+    /node\s+scripts\/export-pdf\.js\b[\s\S]*--preset=all\b/,
+    "Missing or unexpected export:pdf:all script."
   );
   expect(Boolean(dependencies["playwright-core"]), "Missing playwright-core dependency.");
   expect(fs.existsSync(exportScriptPath), "Missing scripts/export-pdf.js.");
@@ -195,6 +205,37 @@ async function main() {
   expect(
     defaultChromePath === "/mock/bin/google-chrome",
     `Expected linux defaults to resolve Chrome from PATH, got: ${defaultChromePath}`
+  );
+
+  const presetModule = loadExportModule({
+    argv: ["node", exportScriptPath, "--preset=all"],
+  });
+  const presetNames = presetModule.getPresetNames(["--preset=all"]);
+  const expectedPresetNames = [
+    "a4-print",
+    "desktop-long-canvas",
+    "mobile-long-canvas",
+  ];
+
+  expect(
+    presetNames.length === expectedPresetNames.length &&
+      expectedPresetNames.every((presetName) => presetNames.includes(presetName)),
+    "Expected --preset=all to resolve all export presets."
+  );
+
+  const outputs = presetModule.buildOutputMap("/tmp/export-test", presetNames);
+
+  expect(
+    outputs["a4-print"].endsWith("resume-a4-print.pdf"),
+    "Expected a4-print output filename."
+  );
+  expect(
+    outputs["desktop-long-canvas"].endsWith("resume-desktop-long-canvas.pdf"),
+    "Expected desktop-long-canvas output filename."
+  );
+  expect(
+    outputs["mobile-long-canvas"].endsWith("resume-mobile-long-canvas.pdf"),
+    "Expected mobile-long-canvas output filename."
   );
 
   const traversalModule = loadExportModule();
