@@ -92,7 +92,7 @@
                   구축
                 </li>
                 <li>
-                  보호자, 피보호자, 공급자 등으로 구성된 '회원' 도메인 설계 및
+                  보호자·피보호자·공급자 등으로 구성된 '회원' 도메인 설계 및
                   백엔드 개발
                 </li>
                 <li>
@@ -103,10 +103,10 @@
               </ul>
               <h5>활용 기술</h5>
               <ul>
-                <li>Java, Spring Boot</li>
+                <li>Java, Spring Boot, JPA, QueryDSL</li>
                 <li>MySQL</li>
                 <li>AWS</li>
-                <li>TypeScript, React</li>
+                <li>TypeScript, React, Tailwind</li>
               </ul>
             </div>
             <!-- 얼티밋 포텐셜 -->
@@ -331,25 +331,13 @@
               </p>
               <h5>세부 진행사항</h5>
               <ul>
-                <li>프로젝트 주제 발제 및 팀 빌딩</li>
-                <li>개별 팀원의 역할 분배 및 프로젝트 일정 관리</li>
-                <li>인프라를 포함한 백엔드 스켈레톤 구축</li>
+                <li>프로젝트 주제 발제, 팀 빌딩, 일정 관리, 업무 배정</li>
+                <li>프로젝트 공통 LLM workflow harness 설정</li>
                 <li>
-                  모든 팀원이 균일한 산출물을 만들 수 있도록 LLM workflow 공통
-                  실행 환경(하네스) 설정
+                  지방의원/지방선거 도메인과 관련된 데이터를
+                  수집·검증·분석·요약하는 파이프라인(workflow) 개발
                 </li>
-                <li>
-                  공공 API, 웹사이트 크롤링 등 다양한 출처로부터
-                  국회의원·지방선거 데이터를 수집하는 파이프라인 초안 개발
-                </li>
-                <li>
-                  지방선거 후보자 데이터를 스크립트 기반 정적 분석과 LLM 기반
-                  동적 분석을 결합해 검증·요약하는 workflow 개발
-                </li>
-                <li>
-                  요약한 지방선거 후보자 데이터를 기반으로 인스타그램 카드뉴스
-                  게시물을 생성하는 workflow 개발
-                </li>
+                <li>AWS, Docker, GitHub Actions 기반 프로젝트 인프라 관리</li>
               </ul>
               <h5>활용 기술</h5>
               <ul>
@@ -456,28 +444,31 @@
           <h3>Backend</h3>
           <ul>
             <li>Java(Spring Boot) 기반 API 개발</li>
-            <li>도메인/데이터 기반 모델링</li>
+            <li>JPA 기반 엔티티 설계 및 QueryDSL 기반 조회 로직 구현</li>
+            <li>
+              관계형 데이터베이스(MySQL, DB2) 기반 스키마 설계 및 데이터 관리
+            </li>
           </ul>
         </div>
         <div class="other">
           <h3>Frontend</h3>
           <ul>
-            <li>TypeScript 기반 SPA(Angular, React) UI 개발</li>
+            <li>TypeScript, Tailwind 기반 SPA(Angular, React) 개발</li>
           </ul>
         </div>
         <div class="other">
           <h3>DevOps</h3>
           <ul>
-            <li>AWS 기반 서비스 인프라 구성 및 운영</li>
-            <li>GitHub Actions, Jenkins 기반 CI/CD 구축</li>
+            <li>Docker Compose, AWS 기반 인프라 구성</li>
+            <li>GitHub Actions 기반 CI/CD 환경 구축</li>
           </ul>
         </div>
         <div class="other">
           <h3>Data / AI</h3>
           <ul>
-            <li>Python 기반 데이터 분석/정제 및 머신러닝 모델 개발</li>
-            <li>Dense Retrieval 기반 RAG 파이프라인 구축</li>
             <li>LLM, LangGraph 기반 Agentic Workflow 구현</li>
+            <li>Dense Retrieval 기반 RAG 파이프라인 구축</li>
+            <li>Python 기반 데이터 분석/정제 및 머신러닝 모델 개발</li>
           </ul>
         </div>
         <div class="other">
