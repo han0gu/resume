@@ -8,8 +8,12 @@
     "start": "parcel src/index.html",
     "build": "rm -rf dist && parcel build --no-cache -d dist --public-url /resume src/index.html",
     "check:analytics": "node scripts/check-analytics.js",
+    "check:export": "node scripts/check-export-pdf.js",
+    "check:print": "node scripts/check-print-css.js",
     "check:dist": "node scripts/check-dist.js",
-    "check:site": "yarn check:analytics && yarn build && yarn check:dist"
+    "check:site": "yarn check:analytics && yarn build && yarn check:dist",
+    "export:pdf": "yarn build && node scripts/export-pdf.js --mode=print",
+    "export:pdf:compare": "yarn build && node scripts/export-pdf.js --mode=both"
   },
   "dependencies": {
     "normalize.css": "^8.0.0",
@@ -19,6 +23,7 @@
     "autoprefixer": "^9.1.5",
     "cssnano": "^4.1.4",
     "parcel-bundler": "^1.12.5",
+    "playwright-core": "^1.59.1",
     "postcss-modules": "^1.4.1"
   },
   "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"

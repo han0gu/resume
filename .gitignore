@@ -1,11 +1,10 @@
 .cache
+.worktrees/
 node_modules
 dist
-docs
+docs/*
+!docs/pdf-export.md
 data
-
-# company-and-jd
-company-and-jd/
 
 # LLM
 AGENTS.md
