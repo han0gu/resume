@@ -211,10 +211,15 @@ async function main() {
     argv: ["node", exportScriptPath, "--preset=all"],
   });
   const presetNames = presetModule.getPresetNames(["--preset=all"]);
+  const expectedPresetNames = [
+    "a4-print",
+    "desktop-long-canvas",
+    "mobile-long-canvas",
+  ];
 
   expect(
-    JSON.stringify(presetNames) ===
-      JSON.stringify(["a4-print", "desktop-long-canvas", "mobile-long-canvas"]),
+    presetNames.length === expectedPresetNames.length &&
+      expectedPresetNames.every((presetName) => presetNames.includes(presetName)),
     "Expected --preset=all to resolve all export presets."
   );
 

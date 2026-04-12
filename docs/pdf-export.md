@@ -34,8 +34,8 @@ PDF export는 `preset` 기반으로 동작한다.
 
 예시:
 
-- `yarn export:pdf:desktop-long-canvas --output-dir=tmp/export/pdf/260412`
-- `node scripts/export-pdf.js --preset=mobile-long-canvas --output-dir=tmp/export/pdf/260412`
+- `yarn export:pdf:desktop-long-canvas --output-dir=tmp/exports/pdf/260412`
+- `node scripts/export-pdf.js --preset=mobile-long-canvas --output-dir=tmp/exports/pdf/260412`
 
 ## Chrome 실행 파일 경로
 

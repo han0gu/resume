@@ -381,9 +381,9 @@ function buildPdfOptions(preset, outputPath, documentHeight) {
     path: outputPath,
     printBackground: true,
     displayHeaderFooter: false,
-    format: preset.pdf.format || "A4",
-    preferCSSPageSize: Boolean(preset.pdf.preferCSSPageSize),
-    scale: preset.pdf.scale || 1,
+    format: preset.pdf?.format || "A4",
+    preferCSSPageSize: Boolean(preset.pdf?.preferCSSPageSize),
+    scale: preset.pdf?.scale || 1,
   };
 }
 
