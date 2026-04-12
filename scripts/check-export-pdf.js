@@ -203,6 +203,10 @@ async function main() {
     traversalModule.resolveRequestPath("/resume/..%2Fdist-backup/secret.txt") === null,
     "Expected dist boundary check to reject prefix-based traversal paths."
   );
+  expect(
+    traversalModule.resolveRequestPath("/resume/%E0%A4%A") === null,
+    "Expected malformed percent-encoded paths to return null instead of throwing."
+  );
 
   const validIndex = traversalModule.resolveRequestPath("/resume/");
 

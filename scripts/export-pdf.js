@@ -224,9 +224,17 @@ function resolveRequestPath(urlPath) {
     return null;
   }
 
-  const relativePath = decodeURIComponent(
-    urlPath.replace(/^\/resume\//, "")
-  ).replace(/^\/+/, "");
+  let relativePath = "";
+
+  try {
+    relativePath = decodeURIComponent(urlPath.replace(/^\/resume\//, "")).replace(
+      /^\/+/,
+      ""
+    );
+  } catch {
+    return null;
+  }
+
   const filePath = path.resolve(distDir, relativePath);
 
   if (!isPathInsideDirectory(distDir, filePath)) {
