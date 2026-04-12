@@ -5,9 +5,6 @@ const { chromium } = require("playwright-core");
 
 const projectRoot = path.resolve(__dirname, "..");
 const distDir = path.join(projectRoot, "dist");
-const defaultChromePath =
-  process.env.CHROME_PATH ||
-  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 
 function fail(message) {
   console.error(`[export-pdf] ${message}`);
@@ -39,14 +36,14 @@ function createRunId() {
   ].join("");
 }
 
-function getArgValue(name) {
+function getArgValue(name, argv = process.argv.slice(2)) {
   const prefix = `--${name}=`;
-  const entry = process.argv.slice(2).find((arg) => arg.startsWith(prefix));
+  const entry = argv.find((arg) => arg.startsWith(prefix));
   return entry ? entry.slice(prefix.length) : "";
 }
 
-function getMode() {
-  const mode = getArgValue("mode") || "print";
+function getMode(argv = process.argv.slice(2)) {
+  const mode = getArgValue("mode", argv) || "print";
 
   if (!["print", "legacy", "both"].includes(mode)) {
     fail(`Unsupported mode: ${mode}`);
@@ -55,8 +52,8 @@ function getMode() {
   return mode;
 }
 
-function getOutputDir() {
-  const customOutputDir = getArgValue("output-dir");
+function getOutputDir(argv = process.argv.slice(2)) {
+  const customOutputDir = getArgValue("output-dir", argv);
 
   if (customOutputDir) {
     return path.resolve(projectRoot, customOutputDir);
@@ -65,9 +62,123 @@ function getOutputDir() {
   return path.join(projectRoot, "tmp", "exports", createRunId());
 }
 
-function getChromePath() {
-  const chromePath = getArgValue("chrome-path") || defaultChromePath;
-  return path.resolve(chromePath);
+function isExplicitPath(target) {
+  return path.isAbsolute(target) || /[\\/]/.test(target);
+}
+
+function normalizeExecutableTarget(target) {
+  return isExplicitPath(target) ? path.resolve(target) : target;
+}
+
+function getDefaultChromeCandidates(platform = process.platform) {
+  if (platform === "darwin") {
+    return ["/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"];
+  }
+
+  if (platform === "win32") {
+    return [
+      "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+    ];
+  }
+
+  return [
+    "google-chrome",
+    "google-chrome-stable",
+    "chromium-browser",
+    "chromium",
+    "/usr/bin/google-chrome",
+    "/usr/bin/google-chrome-stable",
+    "/snap/bin/chromium",
+  ];
+}
+
+function findExecutableInPath(
+  executableName,
+  env = process.env,
+  platform = process.platform,
+  fsModule = fs
+) {
+  const pathValue = env.PATH || "";
+  const directories = pathValue.split(path.delimiter).filter(Boolean);
+  const extensions =
+    platform === "win32"
+      ? ["", ...String(env.PATHEXT || ".EXE;.CMD;.BAT").split(";").filter(Boolean)]
+      : [""];
+
+  for (const directory of directories) {
+    for (const extension of extensions) {
+      const candidatePath = path.join(directory, `${executableName}${extension}`);
+
+      if (fsModule.existsSync(candidatePath)) {
+        return candidatePath;
+      }
+    }
+  }
+
+  return "";
+}
+
+function resolveExecutableTarget(
+  target,
+  env = process.env,
+  platform = process.platform,
+  fsModule = fs
+) {
+  const normalizedTarget = normalizeExecutableTarget(target);
+
+  if (isExplicitPath(target)) {
+    return fsModule.existsSync(normalizedTarget) ? normalizedTarget : "";
+  }
+
+  return findExecutableInPath(target, env, platform, fsModule);
+}
+
+function getChromePath(options = {}) {
+  const argv = options.argv || process.argv.slice(2);
+  const env = options.env || process.env;
+  const platform = options.platform || process.platform;
+  const fsModule = options.fsModule || fs;
+  const requestedTarget = getArgValue("chrome-path", argv) || env.CHROME_PATH;
+
+  if (requestedTarget) {
+    return (
+      resolveExecutableTarget(requestedTarget, env, platform, fsModule) ||
+      normalizeExecutableTarget(requestedTarget)
+    );
+  }
+
+  const candidates = getDefaultChromeCandidates(platform);
+
+  for (const candidate of candidates) {
+    const resolvedTarget = resolveExecutableTarget(candidate, env, platform, fsModule);
+
+    if (resolvedTarget) {
+      return resolvedTarget;
+    }
+  }
+
+  return normalizeExecutableTarget(candidates[0]);
+}
+
+function assertExecutableExists(
+  executablePath,
+  label,
+  env = process.env,
+  platform = process.platform,
+  fsModule = fs
+) {
+  const resolvedTarget =
+    resolveExecutableTarget(executablePath, env, platform, fsModule) ||
+    (isExplicitPath(executablePath) && fsModule.existsSync(executablePath)
+      ? executablePath
+      : "");
+
+  if (!resolvedTarget) {
+    fail(`${label} not found: ${executablePath}`);
+  }
+
+  return resolvedTarget;
 }
 
 function contentTypeFor(filePath) {
@@ -95,6 +206,11 @@ function contentTypeFor(filePath) {
   }
 }
 
+function isPathInsideDirectory(directoryPath, targetPath) {
+  const relativePath = path.relative(directoryPath, targetPath);
+  return relativePath === "" || (!relativePath.startsWith("..") && !path.isAbsolute(relativePath));
+}
+
 function resolveRequestPath(urlPath) {
   if (urlPath === "/") {
     return { redirect: "/resume/" };
@@ -113,11 +229,36 @@ function resolveRequestPath(urlPath) {
   ).replace(/^\/+/, "");
   const filePath = path.resolve(distDir, relativePath);
 
-  if (!filePath.startsWith(distDir)) {
+  if (!isPathInsideDirectory(distDir, filePath)) {
     return null;
   }
 
   return { filePath };
+}
+
+function sendTextResponse(response, statusCode, body) {
+  if (!response.headersSent) {
+    response.writeHead(statusCode, {
+      "Content-Type": "text/plain; charset=utf-8",
+    });
+  }
+
+  response.end(body);
+}
+
+function pipeFileToResponse(filePath, response) {
+  const stream = fs.createReadStream(filePath);
+
+  stream.on("error", () => {
+    sendTextResponse(response, 500, "Failed to read file");
+  });
+
+  stream.on("open", () => {
+    response.writeHead(200, {
+      "Content-Type": contentTypeFor(filePath),
+    });
+    stream.pipe(response);
+  });
 }
 
 function startStaticServer() {
@@ -127,8 +268,7 @@ function startStaticServer() {
       const resolution = resolveRequestPath(urlPath);
 
       if (!resolution) {
-        response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
-        response.end("Not Found");
+        sendTextResponse(response, 404, "Not Found");
         return;
       }
 
@@ -139,15 +279,11 @@ function startStaticServer() {
       }
 
       if (!fs.existsSync(resolution.filePath)) {
-        response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
-        response.end("Not Found");
+        sendTextResponse(response, 404, "Not Found");
         return;
       }
 
-      response.writeHead(200, {
-        "Content-Type": contentTypeFor(resolution.filePath),
-      });
-      fs.createReadStream(resolution.filePath).pipe(response);
+      pipeFileToResponse(resolution.filePath, response);
     });
 
     server.on("error", reject);
@@ -201,11 +337,10 @@ function buildOutputMap(outputDir, mode) {
 async function main() {
   const mode = getMode();
   const outputDir = getOutputDir();
-  const chromePath = getChromePath();
+  const chromePath = assertExecutableExists(getChromePath(), "Chrome executable");
 
   assertFileExists(distDir, "dist directory");
   assertFileExists(path.join(distDir, "index.html"), "built index.html");
-  assertFileExists(chromePath, "Chrome executable");
 
   fs.mkdirSync(outputDir, { recursive: true });
 
