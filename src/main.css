@@ -245,3 +245,139 @@ ul > li:before {
   color: #666666;
   font-size: 0.95rem;
 }
+
+@page {
+  size: A4 portrait;
+  margin: 14mm 14mm 16mm;
+}
+
+@media print {
+  html,
+  body {
+    font-size: 13px;
+    padding-bottom: 0;
+    overflow: visible;
+    background: #ffffff;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body:before {
+    display: none;
+  }
+
+  section,
+  .site-footer {
+    padding: 0;
+  }
+
+  .container,
+  .site-footer {
+    width: auto;
+    max-width: none;
+    margin: 0;
+  }
+
+  .site-footer {
+    display: none;
+  }
+
+  h1 {
+    margin: 0 0 1rem 0;
+    font-size: 2.75rem;
+  }
+
+  h2 {
+    margin: 2rem 0 1rem 0;
+    font-size: 2rem;
+  }
+
+  h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.35rem;
+  }
+
+  h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.2rem;
+  }
+
+  h5 {
+    margin: 0 0 0.35rem 0;
+    font-size: 1rem;
+  }
+
+  p,
+  ul {
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+
+  ul > li {
+    padding: 0.15rem 0 0.15rem 0.9rem;
+  }
+
+  .big-paragraph {
+    font-size: 1.15rem;
+    line-height: 1.55;
+  }
+
+  .row {
+    display: block;
+    padding: 1.1rem 0;
+    break-inside: auto;
+    page-break-inside: auto;
+  }
+
+  .row-left {
+    padding-right: 0;
+    margin: 0 0 0.75rem 0;
+    break-after: avoid-page;
+    page-break-after: avoid;
+  }
+
+  .company-overview,
+  .education-overview {
+    margin: 0 0 0.9rem 0;
+  }
+
+  .project {
+    padding: 0.8rem 0;
+    break-inside: auto;
+    page-break-inside: auto;
+  }
+
+  .other {
+    padding: 1rem 0;
+    break-inside: avoid-page;
+    page-break-inside: avoid;
+  }
+
+  .analytics-notice {
+    font-size: 0.8rem;
+  }
+
+  h2,
+  h3,
+  h4,
+  h5,
+  .education-project-title,
+  .education-project-meta {
+    break-after: avoid-page;
+    page-break-after: avoid;
+  }
+
+  .project > h5 + p,
+  .project > h5 + ul,
+  .education-project-title + .education-project-meta,
+  .education-project-meta + h5 {
+    break-before: avoid-page;
+    page-break-before: avoid;
+  }
+
+  p,
+  li {
+    orphans: 3;
+    widows: 3;
+  }
+}
