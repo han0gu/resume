@@ -15,20 +15,55 @@ function fail(message, error) {
   process.exit(1);
 }
 
-function getArgValue(name, argv = process.argv.slice(2)) {
-  const prefix = `--${name}=`;
-  const entry = argv.find((arg) => arg.startsWith(prefix));
-  return entry ? entry.slice(prefix.length) : "";
+function extractArgValue(name, argv = process.argv.slice(2)) {
+  const flag = `--${name}`;
+  const prefix = `${flag}=`;
+  const remainingArgs = [];
+  let value = "";
+
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+
+    if (!value && arg.startsWith(prefix)) {
+      value = arg.slice(prefix.length);
+
+      if (!value) {
+        fail(`Missing value for ${flag}.`);
+      }
+
+      continue;
+    }
+
+    if (!value && arg === flag) {
+      const nextArg = argv[index + 1];
+
+      if (!nextArg || nextArg.startsWith("--")) {
+        fail(`Missing value for ${flag}.`);
+      }
+
+      value = nextArg;
+      index += 1;
+      continue;
+    }
+
+    remainingArgs.push(arg);
+  }
+
+  return { value, remainingArgs };
 }
 
-function getMode(argv = process.argv.slice(2)) {
-  const mode = getArgValue("mode", argv) || "build";
+function getRuntimeOptions(argv = process.argv.slice(2)) {
+  const { value, remainingArgs } = extractArgValue("mode", argv);
+  const mode = value || "build";
 
   if (mode !== "build" && mode !== "serve") {
     fail(`Unsupported --mode value: ${mode}`);
   }
 
-  return mode;
+  return {
+    mode,
+    parcelArgs: remainingArgs,
+  };
 }
 
 function isDeasyncBindingError(error) {
@@ -102,12 +137,16 @@ function getParcelCliPath() {
   }
 }
 
-function runParcel(mode) {
+function runParcel(mode, extraArgs = []) {
   const parcelCliPath = getParcelCliPath();
-  const result = spawnSync(process.execPath, [parcelCliPath, ...getParcelArgs(mode)], {
-    cwd: projectRoot,
-    stdio: "inherit",
-  });
+  const result = spawnSync(
+    process.execPath,
+    [parcelCliPath, ...getParcelArgs(mode), ...extraArgs],
+    {
+      cwd: projectRoot,
+      stdio: "inherit",
+    }
+  );
 
   if (result.error) {
     fail("Failed to start Parcel.", result.error);
@@ -117,15 +156,15 @@ function runParcel(mode) {
 }
 
 function main(argv = process.argv.slice(2)) {
-  const mode = getMode(argv);
+  const options = getRuntimeOptions(argv);
 
   ensureCompatibleRuntime();
 
-  if (mode === "build") {
+  if (options.mode === "build") {
     fs.rmSync(distDir, { recursive: true, force: true });
   }
 
-  runParcel(mode);
+  runParcel(options.mode, options.parcelArgs);
 }
 
 if (require.main === module) {
@@ -133,7 +172,8 @@ if (require.main === module) {
 }
 
 module.exports = {
-  getMode,
+  extractArgValue,
+  getRuntimeOptions,
   getParcelArgs,
   isDeasyncBindingError,
   getBindingRecoveryMessage,

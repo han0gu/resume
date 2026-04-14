@@ -25,6 +25,7 @@
   "devDependencies": {
     "autoprefixer": "^9.1.5",
     "cssnano": "^4.1.4",
+    "deasync": "0.1.24",
     "parcel-bundler": "^1.12.5",
     "playwright-core": "^1.59.1",
     "postcss-modules": "^1.4.1"

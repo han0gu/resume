@@ -43,10 +43,30 @@ function main() {
   );
   expect(fs.existsSync(runSiteScriptPath), "Missing scripts/run-site.js.");
 
-  expect(runSiteModule.getMode([]) === "build", "Expected default mode to be build.");
+  const defaultOptions = runSiteModule.getRuntimeOptions([]);
+  const equalsModeOptions = runSiteModule.getRuntimeOptions(["--mode=serve"]);
+  const splitModeOptions = runSiteModule.getRuntimeOptions(["--mode", "serve"]);
+  const passthroughOptions = runSiteModule.getRuntimeOptions([
+    "--mode=build",
+    "--no-source-maps",
+    "--detailed-report",
+  ]);
+
+  expect(defaultOptions.mode === "build", "Expected default mode to be build.");
   expect(
-    runSiteModule.getMode(["--mode=serve"]) === "serve",
+    equalsModeOptions.mode === "serve",
     "Expected --mode=serve to resolve serve mode."
+  );
+  expect(
+    splitModeOptions.mode === "serve",
+    "Expected --mode serve to resolve serve mode."
+  );
+  expect(
+    passthroughOptions.mode === "build" &&
+      passthroughOptions.parcelArgs.length === 2 &&
+      passthroughOptions.parcelArgs[0] === "--no-source-maps" &&
+      passthroughOptions.parcelArgs[1] === "--detailed-report",
+    "Expected non-runtime CLI args to pass through to Parcel."
   );
 
   const buildArgs = runSiteModule.getParcelArgs("build");
