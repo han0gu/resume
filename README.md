@@ -7,10 +7,17 @@
 - 의존성 설치: `yarn install`
 - 로컬 개발 서버: `yarn start`
 - production build: `yarn build`
+- CI 기준 Node 버전: `20`
+
+Node major 버전을 바꾼 뒤 `start`, `build`, `export`에서 `deasync` binding 오류가 나면, 현재 사용 중인 Node 버전으로 native module을 다시 맞춰야 한다.
+
+- 전체 재설치: `yarn install`
+- 빠른 복구: `npm rebuild deasync`
 
 ## 검증
 
 - analytics helper 검증: `yarn check:analytics`
+- site runtime 가드 검증: `yarn check:runtime`
 - print stylesheet 검증: `yarn check:print`
 - PDF export 스크립트 검증: `yarn check:export`
 - build 산출물 검증: `yarn check:dist`
