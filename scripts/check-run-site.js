@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 
 const packageJsonPath = path.join(process.cwd(), "package.json");
+const nvmrcPath = path.join(process.cwd(), ".nvmrc");
 const runSiteScriptPath = path.join(process.cwd(), "scripts", "run-site.js");
 
 function fail(message, error) {
@@ -29,7 +30,15 @@ function expectMatch(value, pattern, message) {
 function main() {
   const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
   const scripts = packageJson.scripts || {};
+  expect(fs.existsSync(nvmrcPath), "Missing .nvmrc.");
+  const nvmrc = fs.readFileSync(nvmrcPath, "utf8").trim();
   const runSiteModule = require(runSiteScriptPath);
+
+  expect(nvmrc === "20", "Expected .nvmrc to pin Node 20.");
+  expect(
+    packageJson.engines && packageJson.engines.node === "20.x",
+    "Expected package.json engines.node to pin Node 20.x."
+  );
 
   expectMatch(
     scripts.start,
@@ -108,6 +117,30 @@ function main() {
   expect(
     runSiteModule.getMissingDependenciesMessage().includes("yarn install"),
     "Expected dependency recovery message to include yarn install."
+  );
+
+  expect(
+    runSiteModule.getSupportedNodeMajor() === 20,
+    "Expected supported Node major version to be 20."
+  );
+  expect(
+    runSiteModule.isSupportedNodeVersion("v20.20.2"),
+    "Expected Node 20.x to be treated as supported."
+  );
+  expect(
+    !runSiteModule.isSupportedNodeVersion("v24.14.1"),
+    "Expected Node 24.x to be treated as unsupported."
+  );
+
+  const unsupportedVersionMessage =
+    runSiteModule.getUnsupportedNodeVersionMessage("v24.14.1");
+
+  expect(
+    unsupportedVersionMessage.includes("Node.js 20.x") &&
+      unsupportedVersionMessage.includes("v24.14.1") &&
+      unsupportedVersionMessage.includes("nvm use") &&
+      unsupportedVersionMessage.includes("corepack enable"),
+    "Expected unsupported Node version message to include the current version and recovery commands."
   );
 
   console.log("[check-run-site] Runtime guard checks passed.");

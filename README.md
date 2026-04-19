@@ -4,11 +4,14 @@
 
 ## 개발
 
+- Node 버전 고정: `nvm use` (`.nvmrc` = `20`)
+- `yarn` shim 초기화(최초 1회): `corepack enable`
 - 의존성 설치: `yarn install`
 - 로컬 개발 서버: `yarn start`
 - production build: `yarn build`
 - CI 기준 Node 버전: `20`
 
+이 저장소는 `Node 20.x`를 기준으로 동작한다.
 Node major 버전을 바꾼 뒤 `start`, `build`, `export`에서 `deasync` binding 오류가 나면, 현재 사용 중인 Node 버전으로 native module을 다시 맞춰야 한다.
 
 - 전체 재설치: `yarn install`
