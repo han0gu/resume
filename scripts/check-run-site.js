@@ -30,10 +30,10 @@ function expectMatch(value, pattern, message) {
 function main() {
   const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
   const scripts = packageJson.scripts || {};
+  expect(fs.existsSync(nvmrcPath), "Missing .nvmrc.");
   const nvmrc = fs.readFileSync(nvmrcPath, "utf8").trim();
   const runSiteModule = require(runSiteScriptPath);
 
-  expect(fs.existsSync(nvmrcPath), "Missing .nvmrc.");
   expect(nvmrc === "20", "Expected .nvmrc to pin Node 20.");
   expect(
     packageJson.engines && packageJson.engines.node === "20.x",
