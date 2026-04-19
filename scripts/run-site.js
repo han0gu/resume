@@ -4,6 +4,7 @@ const { spawnSync } = require("child_process");
 
 const projectRoot = path.resolve(__dirname, "..");
 const distDir = path.join(projectRoot, "dist");
+const SUPPORTED_NODE_MAJOR = 20;
 
 function fail(message, error) {
   console.error(`[run-site] ${message}`);
@@ -64,6 +65,46 @@ function getRuntimeOptions(argv = process.argv.slice(2)) {
     mode,
     parcelArgs: remainingArgs,
   };
+}
+
+function getSupportedNodeMajor() {
+  return SUPPORTED_NODE_MAJOR;
+}
+
+function getNodeMajorVersion(nodeVersion = process.version) {
+  const match = String(nodeVersion).match(/^v(\d+)\./);
+
+  if (!match) {
+    return NaN;
+  }
+
+  return Number(match[1]);
+}
+
+function isSupportedNodeVersion(nodeVersion = process.version) {
+  return getNodeMajorVersion(nodeVersion) === getSupportedNodeMajor();
+}
+
+function getUnsupportedNodeVersionMessage(nodeVersion = process.version) {
+  return [
+    `This repository expects Node.js ${getSupportedNodeMajor()}.x.`,
+    `Current runtime: ${nodeVersion}.`,
+    "Switch to the pinned version before running resume scripts:",
+    "  nvm use",
+    "If Node 20 is not installed yet:",
+    "  nvm install 20",
+    "If `yarn` is not available after switching:",
+    "  corepack enable",
+    "If native modules were built under another Node major:",
+    "  yarn install",
+    "  npm rebuild deasync",
+  ].join("\n");
+}
+
+function ensureSupportedNodeVersion(nodeVersion = process.version) {
+  if (!isSupportedNodeVersion(nodeVersion)) {
+    fail(getUnsupportedNodeVersionMessage(nodeVersion));
+  }
 }
 
 function isDeasyncBindingError(error) {
@@ -158,6 +199,7 @@ function runParcel(mode, extraArgs = []) {
 function main(argv = process.argv.slice(2)) {
   const options = getRuntimeOptions(argv);
 
+  ensureSupportedNodeVersion();
   ensureCompatibleRuntime();
 
   if (options.mode === "build") {
@@ -174,6 +216,10 @@ if (require.main === module) {
 module.exports = {
   extractArgValue,
   getRuntimeOptions,
+  getSupportedNodeMajor,
+  getNodeMajorVersion,
+  isSupportedNodeVersion,
+  getUnsupportedNodeVersionMessage,
   getParcelArgs,
   isDeasyncBindingError,
   getBindingRecoveryMessage,

@@ -17,7 +17,9 @@ PDF export는 `preset` 기반으로 동작한다.
 각 명령은 `build`를 먼저 실행한 뒤, 대응되는 preset PDF를 생성한다.
 `yarn export:pdf:all`은 같은 실행 디렉터리 안에 세 가지 산출물을 함께 생성한다.
 
-CI 기준 Node 버전은 `20`이다.
+이 저장소의 기준 Node 버전은 `.nvmrc`에 맞춘 `20.x`다.
+로컬에서는 먼저 `nvm use`로 버전을 맞추고, `yarn` 명령이 없으면 최초 1회 `corepack enable`을 실행한다.
+CI 기준 Node 버전도 `20`이다.
 로컬에서 Node major 버전을 바꾼 뒤 `start`, `build`, `export` 중 하나에서 `deasync` binding 오류가 나면, 현재 사용 중인 Node 버전으로 native module을 다시 맞춘다.
 
 - 전체 재설치: `yarn install`
